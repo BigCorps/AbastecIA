@@ -121,7 +121,6 @@ fun MainAppNavigation(
                     InteractivePaymentDialog(
                         order = activePaymentOrder!!,
                         viewModel = pagamentoViewModel,
-                        terminalMac = configViewModel.terminalMac.collectAsState().value,
                         onDismiss = {
                             showPaymentDialog = false
                             activePaymentOrder = null
@@ -145,7 +144,6 @@ fun PainelScreen(
     val completedOrders by viewModel.completedOrders.collectAsState()
     val isConnected by viewModel.isSupabaseConnected.collectAsState()
     val connStatus by viewModel.connectionStatus.collectAsState()
-    val macAddress by configViewModel.terminalMac.collectAsState()
 
     var showOrderSimulator by remember { mutableStateOf(false) }
 
@@ -206,17 +204,16 @@ fun PainelScreen(
                     }
                 }
 
-                // Right side: Compact Badges (BT & CLD status)
+                // Right side: Compact Badges (NATIVE POS & CLD status)
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // BT: Terminal Connected Badge
-                    val hasMac = macAddress.isNotBlank() && macAddress != "00:00:00:00:00:00"
+                    // NATIVO: Terminal Local Integration Badge
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(100))
-                            .background(if (hasMac) HighDensityBlueBadgeBg else HighDensityDoneBg)
+                            .background(HighDensityBlueBadgeBg)
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -224,14 +221,14 @@ fun PainelScreen(
                             modifier = Modifier
                                 .size(6.dp)
                                 .clip(CircleShape)
-                                .background(if (hasMac) HighDensityPrimary else Color.Gray)
+                                .background(HighDensityPrimary)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "BT",
+                            text = "NATIVO",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (hasMac) HighDensityBlueBadgeText else HighDensityTextSecondary
+                            color = HighDensityBlueBadgeText
                         )
                     }
 
@@ -478,19 +475,7 @@ fun OrderCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Secondary action: Remove/Trash
-                OutlinedButton(
-                    onClick = onRemoveClick,
-                    modifier = Modifier.height(44.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    border = BorderStroke(1.dp, HighDensityTertiary.copy(alpha = 0.5f)),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = HighDensityTertiary),
-                    contentPadding = PaddingValues(horizontal = 12.dp)
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Excluir", modifier = Modifier.size(18.dp))
-                }
-
-                // Primary action: Cobrar na Maquininha
+                // Primary action: Cobrar na Maquininha (First)
                 Button(
                     onClick = onPaymentClick,
                     modifier = Modifier
@@ -508,6 +493,18 @@ fun OrderCard(
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
+                }
+
+                // Secondary action: Remove/Trash (Later)
+                OutlinedButton(
+                    onClick = onRemoveClick,
+                    modifier = Modifier.height(44.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, HighDensityTertiary.copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = HighDensityTertiary),
+                    contentPadding = PaddingValues(horizontal = 12.dp)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Excluir", modifier = Modifier.size(18.dp))
                 }
             }
         }
@@ -624,17 +621,10 @@ fun CompletedOrderCard(
 fun ConfigScreen(
     viewModel: ConfigViewModel
 ) {
-    val context = LocalContext.current
     val supabaseUrl by viewModel.supabaseUrl.collectAsState()
     val supabaseKey by viewModel.supabaseKey.collectAsState()
     val companyId by viewModel.companyId.collectAsState()
-    val terminalMac by viewModel.terminalMac.collectAsState()
     val useSimulation by viewModel.useSimulation.collectAsState()
-    val pairedDevices by viewModel.pairedDevices.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadPairedDevices(context)
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -650,7 +640,7 @@ fun ConfigScreen(
                 color = HighDensityTextMain
             )
             Text(
-                text = "Integração Supabase Realtime + Maquininha PlugPag Bluetooth",
+                text = "Integração Supabase Realtime diretamente no Smart POS PagBank",
                 fontSize = 12.sp,
                 color = HighDensityTextSecondary
             )
@@ -768,70 +758,6 @@ fun ConfigScreen(
                 }
             }
         }
-
-        // Section: Terminal MAC settings
-        item {
-            Card(
-                modifier = Modifier.border(1.dp, HighDensityOutline, RoundedCornerShape(12.dp)),
-                colors = CardDefaults.cardColors(containerColor = HighDensitySurfaceCard)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Maquininha Pareada (Bluetooth)",
-                        fontWeight = FontWeight.Bold,
-                        color = HighDensityTextMain,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = terminalMac,
-                        onValueChange = { viewModel.updateTerminalMac(it) },
-                        label = { Text("MAC Address") },
-                        modifier = Modifier.fillMaxWidth().testTag("mac_address"),
-                        leadingIcon = { Icon(Icons.Default.Bluetooth, contentDescription = null) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = HighDensityTextMain,
-                            unfocusedTextColor = HighDensityTextSecondary,
-                            focusedBorderColor = HighDensityPrimary,
-                            unfocusedBorderColor = HighDensityOutline,
-                            focusedLabelColor = HighDensityPrimary,
-                            unfocusedLabelColor = HighDensityTextSecondary,
-                            focusedLeadingIconColor = HighDensityPrimary,
-                            unfocusedLeadingIconColor = HighDensityTextSecondary
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Dispositivos Encontrados Próximos:",
-                        fontSize = 12.sp,
-                        color = HighDensityTextSecondary,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    pairedDevices.forEach { device ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.updateTerminalMac(device.second)
-                                    Toast.makeText(context, "${device.first} Selecionado!", Toast.LENGTH_SHORT).show()
-                                }
-                                .padding(vertical = 10.dp, horizontal = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.Devices, contentDescription = null, tint = HighDensityPrimary)
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(device.first, color = HighDensityTextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text(device.second, color = HighDensityTextSecondary, fontSize = 11.sp)
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -839,7 +765,6 @@ fun ConfigScreen(
 fun InteractivePaymentDialog(
     order: FuelOrder,
     viewModel: PagamentoViewModel,
-    terminalMac: String,
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -872,7 +797,7 @@ fun InteractivePaymentDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Cobrança Automática Bluetooth",
+                        text = "Cobrança Direta no Terminal",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         color = HighDensityTextMain
@@ -954,7 +879,8 @@ fun InteractivePaymentDialog(
                                 Text(
                                     "CRÉDITO",
                                     color = if (paymentType == PlugPag.TYPE_CREDITO) Color.White else HighDensityTextSecondary,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
                                 )
                             }
 
@@ -972,7 +898,53 @@ fun InteractivePaymentDialog(
                                 Text(
                                     "DÉBITO",
                                     color = if (paymentType == PlugPag.TYPE_DEBITO) Color.White else HighDensityTextSecondary,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = { paymentType = PlugPag.TYPE_PIX },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (paymentType == PlugPag.TYPE_PIX) HighDensityPrimary else HighDensityDoneBg
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .testTag("select_pix_btn")
+                            ) {
+                                Text(
+                                    "PIX",
+                                    color = if (paymentType == PlugPag.TYPE_PIX) Color.White else HighDensityTextSecondary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+
+                            Button(
+                                onClick = { paymentType = PlugPag.TYPE_DINHEIRO },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (paymentType == PlugPag.TYPE_DINHEIRO) HighDensityPrimary else HighDensityDoneBg
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .testTag("select_cash_btn")
+                            ) {
+                                Text(
+                                    "DINHEIRO",
+                                    color = if (paymentType == PlugPag.TYPE_DINHEIRO) Color.White else HighDensityTextSecondary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
                                 )
                             }
                         }
@@ -1025,7 +997,7 @@ fun InteractivePaymentDialog(
                                 .testTag("start_pos_payment_btn")
                         ) {
                             Text(
-                                "ENVIAR COMANDO VIA BLUETOOTH",
+                                "INICIAR COBRANÇA",
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )

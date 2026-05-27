@@ -1,6 +1,6 @@
 {
   "name": "abastecIA",
-  "description": "Ponte Bluetooth entre a plataforma web abastecIA e as maquininhas PagBank Bluetooth via SDK PlugPag.",
+  "description": "Aplicativo nativo Smart POS PagBank abastecIA conectado ao Supabase Realtime para cobranças automatizadas.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

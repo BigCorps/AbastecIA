@@ -145,7 +145,7 @@ class PagamentoViewModel(
 
     fun startPayment(orderId: String, amount: Double, paymentType: Int, installments: Int) {
         viewModelScope.launch {
-            _state.value = PaymentState.Processing("Iniciando leitor Bluetooth...")
+            _state.value = PaymentState.Processing("Iniciando leitor de cartões...")
             
             plugPagRepository.setEventListener(object : PlugPagEventListener {
                 override fun onEvent(data: PlugPagEventData) {

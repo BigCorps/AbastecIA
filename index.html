@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abastecIA - Simulador de Abastecimento Web (Vercel)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        .glow-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-[#161b22] py-4 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⛽</span>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight text-white flex items-center">
+                        abastec<span class="text-sky-500">IA</span>
+                    </h1>
+                    <p class="text-xs text-gray-400">Portal do Cliente Web & Simulação Realtime</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-[#21262d] px-3 py-1.5 rounded-full border border-gray-700 text-xs">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-gray-300 font-medium">Pronto para conexão com Supabase</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-6xl mx-auto w-full p-4 lg:p-8 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Column left (Credentials & Simulator) -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Credentials Config Card -->
+            <div class="bg-[#161b22] border border-gray-850 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    🔑 Credenciais do Supabase
+                </h2>
+                <p class="text-xs text-gray-400 mb-4">
+                    Insira as mesmas credenciais configuradas na aba de <strong>Ajustes</strong> da sua maquininha/Smart POS para que ambos se comuniquem em tempo real.
+                </p>
+                
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Supabase URL</label>
+                        <input id="sbUrl" type="url" placeholder="https://vossoprojeto.supabase.co" 
+                               class="w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Anon Public Key</label>
+                        <input id="sbKey" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N..." 
+                               class="w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Company ID (Posto)</label>
+                            <input id="companyId" type="text" placeholder="posto_sul_01" value="posto_sul_01" 
+                                   class="w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="saveCredentials()" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 text-white font-semibold py-2 px-4 rounded-lg text-xs transition duration-200">
+                                Gravar Credenciais
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="saveFeedback" class="hidden mt-3 text-xs text-emerald-400 text-center font-semibold">
+                    Salvo localmente no navegador! 👍
+                </div>
+            </div>
+
+            <!-- Place Fuel Request Simulator Card -->
+            <div class="bg-[#161b22] border border-gray-850 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    🛒 Solicitar Novo Abastecimento (Cliente Web)
+                </h2>
+                <p class="text-xs text-gray-400 mb-4">
+                    Selecione os parâmetros do abastecimento que o frentista receberá de forma instantânea e automatizada na maquininha PagBank.
+                </p>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Número da Bomba</label>
+                            <select id="pumpNum" class="w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                                <option value="01">Bomba #01</option>
+                                <option value="02">Bomba #02</option>
+                                <option value="03" selected>Bomba #03</option>
+                                <option value="04">Bomba #04</option>
+                                <option value="05">Bomba #05</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Placa do Veículo</label>
+                            <input id="plate" type="text" placeholder="BRA2E19" value="BRA2E19"
+                                   class="w-full uppercase bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Tipo de Combustível</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="fuelType" value="Gasolina Comum" checked class="sr-only peer">
+                                <div class="peer-checked:border-sky-500 peer-checked:bg-sky-950/40 border border-gray-700 rounded-lg p-2.5 text-center text-xs text-gray-300 font-semibold duration-150">
+                                    Gasolina Comum
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="fuelType" value="Gasolina Aditivada" class="sr-only peer">
+                                <div class="peer-checked:border-sky-500 peer-checked:bg-sky-950/40 border border-gray-700 rounded-lg p-2.5 text-center text-xs text-gray-300 font-semibold duration-150">
+                                    Aditivada
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="fuelType" value="Etanol Comum" class="sr-only peer">
+                                <div class="peer-checked:border-sky-500 peer-checked:bg-sky-950/40 border border-gray-700 rounded-lg p-2.5 text-center text-xs text-gray-300 font-semibold duration-150">
+                                    Etanol
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="fuelType" value="Diesel S10" class="sr-only peer">
+                                <div class="peer-checked:border-sky-500 peer-checked:bg-sky-950/40 border border-gray-700 rounded-lg p-2.5 text-center text-xs text-gray-300 font-semibold duration-150">
+                                    Diesel S10
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Valor da Cobrança (R$)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setAmount(50)" class="bg-[#21262d] hover:bg-[#30363d] border border-gray-700 text-white py-2 rounded-lg text-sm font-bold duration-150">R$ 50,00</button>
+                            <button onclick="setAmount(100)" class="bg-[#21262d] hover:bg-[#30363d] border border-gray-700 text-white py-2 rounded-lg text-sm font-bold duration-150">R$ 100,00</button>
+                            <button onclick="setAmount(150)" class="bg-[#21262d] hover:bg-[#30363d] border border-gray-700 text-white py-2 rounded-lg text-sm font-bold duration-150">R$ 150,00</button>
+                        </div>
+                        <input id="customAmount" type="number" step="0.01" min="1.00" value="80.00" placeholder="Outro Valor (ex: 80.00)" 
+                               class="w-full mt-2 bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 font-bold">
+                    </div>
+
+                    <button onclick="sendOrder()" class="glow-button w-full bg-sky-500 hover:bg-sky-600 text-black font-black py-3 rounded-xl transition duration-200 text-sm tracking-wide uppercase flex items-center justify-center gap-2 shadow-sky-500/10">
+                        ⚡ Disparar Pedido para o Terminal smart POS (Realtime)
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Column right (Status logs, documentation, Vercel instructions) -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Realtime Console log -->
+            <div class="bg-[#161b22] border border-gray-850 rounded-2xl p-6 shadow-xl flex flex-col min-h-[180px]">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    📟 Live Console
+                </h3>
+                <div id="consoleLog" class="flex-grow bg-[#0d1117] border border-gray-800 p-3 rounded-lg text-xs font-mono text-cyan-400 space-y-1 overflow-y-auto max-h-[160px]">
+                    <div class="text-gray-500">// Console de logs das solicitações postadas</div>
+                </div>
+            </div>
+
+            <!-- Deploy on Vercel deployment checklist -->
+            <div class="bg-[#161b22] border border-gray-850 rounded-2xl p-6 shadow-xl text-sm">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2 text-sky-400">
+                    🛡️ Publicação no Vercel
+                </h3>
+                <p class="text-gray-300 text-xs mb-3">
+                    Basta subir este repositório no seu GitHub e conectar na conta Vercel. Por padrão, ele identificará este arquivo <code class="bg-[#0b0d12] px-1.5 py-0.5 rounded text-gray-400 text-[11px]">index.html</code> como a página de exemplo inicial do seu domínio de teste.
+                </p>
+                <ul class="space-y-2 text-xs text-gray-400">
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-500 font-bold">🗸</span> <span>Pronta para produção, com Tailwind CSS nativo.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-500 font-bold">🗸</span> <span>Usa o endpoint do Supabase Postgrest direto via Ajax (Fetch sem módulos Node).</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-500 font-bold">🗸</span> <span>Grava e lembra de suas credenciais no localStorage automaticamente.</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-[#161b22] py-4 px-6 text-center text-xs text-gray-500 mt-8">
+        <p>© 2026 AbastecIA. Licença Apache 2.0. Desenvolvido para rodar de ponta a ponta com endpoints Supabase e maquininhas PagBank.</p>
+    </footer>
+
+    <!-- Scripting for connection / localStorage Simulation -->
+    <script>
+        // Load stored credentials
+        window.onload = function() {
+            if (localStorage.getItem("ab_sb_url")) {
+                document.getElementById("sbUrl").value = localStorage.getItem("ab_sb_url");
+            }
+            if (localStorage.getItem("ab_sb_key")) {
+                document.getElementById("sbKey").value = localStorage.getItem("ab_sb_key");
+            }
+            if (localStorage.getItem("ab_company_id")) {
+                document.getElementById("companyId").value = localStorage.getItem("ab_company_id");
+            }
+            logMsg("Pronto! Preencha as credenciais correspondentes para simular.");
+        };
+
+        function logMsg(txt) {
+            const consoleDiv = document.getElementById("consoleLog");
+            const time = new Date().toLocaleTimeString();
+            const logLine = document.createElement("div");
+            logLine.innerHTML = `<span class="text-gray-500">[${time}]</span> ${txt}`;
+            consoleDiv.appendChild(logLine);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        function setAmount(val) {
+            document.getElementById("customAmount").value = val.toFixed(2);
+        }
+
+        function saveCredentials() {
+            const url = document.getElementById("sbUrl").value.trim();
+            const key = document.getElementById("sbKey").value.trim();
+            const coId = document.getElementById("companyId").value.trim();
+
+            localStorage.setItem("ab_sb_url", url);
+            localStorage.setItem("ab_sb_key", key);
+            localStorage.setItem("ab_company_id", coId);
+
+            const feedback = document.getElementById("saveFeedback");
+            feedback.classList.remove("hidden");
+            setTimeout(() => {
+                feedback.classList.add("hidden");
+            }, 3000);
+            
+            logMsg("Credenciais gravadas no localStorage.");
+        }
+
+        async function sendOrder() {
+            const url = document.getElementById("sbUrl").value.trim();
+            const key = document.getElementById("sbKey").value.trim();
+            const coId = document.getElementById("companyId").value.trim();
+
+            if (!url || !key) {
+                alert("Por favor, preencha a URL e Anon Key do seu Supabase para realizar transmissões!");
+                logMsg("<span class='text-red-400'>[Erro] URL ou Key não declarados!</span>");
+                return;
+            }
+
+            const pump = document.getElementById("pumpNum").value;
+            const plate = document.getElementById("plate").value.trim().toUpperCase() || null;
+            const customAmt = parseFloat(document.getElementById("customAmount").value);
+            
+            // Get selected fuel radio
+            const fuelOptions = document.getElementsByName("fuelType");
+            let fuel = "Gasolina Comum";
+            for (let opt of fuelOptions) {
+                if (opt.checked) {
+                    fuel = opt.value;
+                    break;
+                }
+            }
+
+            if (isNaN(customAmt) || customAmt <= 0) {
+                alert("Declarar valor válido!");
+                return;
+            }
+
+            // Create payload matching table schema
+            const orderId = "WEB" + Math.floor(100000 + Math.random() * 900000);
+            const payload = {
+                id: orderId,
+                company_id: coId,
+                pump_number: pump,
+                fuel_type: fuel,
+                amount: customAmt,
+                status: "paid", // Status de aguardando cobrança do frentista
+                plate: plate,
+                payment_method: "card"
+            };
+
+            logMsg(`Processando POST em: ${url}/rest/v1/fuel_orders`);
+            
+            try {
+                const response = await fetch(`${url}/rest/v1/fuel_orders`, {
+                    method: "POST",
+                    headers: {
+                        "apikey": key,
+                        "Authorization": `Bearer ${key}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "return=representation"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    logMsg(`🚀 <span class='text-green-400 font-bold'>SUCESSO!</span> Pedido ${orderId} para Bomba ${pump} (R$ ${customAmt.toFixed(2)}) publicado!`);
+                    logMsg(`Verifique na Maquininha PagBank o surgimento deste pedido.`);
+                } else {
+                    const text = await response.text();
+                    logMsg(`<span class='text-red-450'>[Falha HTTP ${response.status}]</span> ${text}`);
+                }
+            } catch (err) {
+                logMsg(`<span class='text-red-450'>[Erro Conexão]</span> ${err.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
