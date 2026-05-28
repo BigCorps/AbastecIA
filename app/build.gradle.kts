@@ -123,7 +123,7 @@ dependencies {
   implementation(libs.hilt.navigation.compose)
 
   // PlugPag SDK
-  implementation(libs.plugpag)
+  // Removed external dependency to use self-contained local mock package under br.uol.pagseguro.plugpag
 
   // Core & Splashscreen
   implementation(libs.androidx.core.splashscreen)

@@ -1,4 +1,4 @@
-package br.com.uol.pagseguro.plugpag
+package br.uol.pagseguro.plugpag
 
 import android.content.Context
 import kotlinx.coroutines.delay
@@ -38,7 +38,7 @@ class PlugPag(context: Context, appIdent: PlugPagAppIdentification) {
                     authorizationCode = "PIX_OK",
                     cardNumber = "PIX",
                     message = "PIX Aprovado",
-                    resultCode = RET_OK
+                    result = RET_OK
                 )
             }
             TYPE_DINHEIRO -> {
@@ -54,11 +54,10 @@ class PlugPag(context: Context, appIdent: PlugPagAppIdentification) {
                     authorizationCode = "CASH_OK",
                     cardNumber = "DINHEIRO",
                     message = "Dinheiro Registrado",
-                    resultCode = RET_OK
+                    result = RET_OK
                 )
             }
             else -> {
-                // Enviar eventos de processamento simulando fluxo real de uma maquininha Bluetooth PagBank
                 eventListener?.onEvent(PlugPagEventData(0, "Iniciando comunicação com leitor..."))
                 delay(1200)
                 eventListener?.onEvent(PlugPagEventData(1, "Aguardando cartão (insira ou aproxime)..."))
@@ -75,10 +74,21 @@ class PlugPag(context: Context, appIdent: PlugPagAppIdentification) {
                     authorizationCode = paymentData.authorizationCode,
                     cardNumber = paymentData.cardNumber,
                     message = "Transação Aprovada",
-                    resultCode = RET_OK
+                    result = RET_OK
                 )
             }
         }
+    }
+
+    suspend fun voidPayment(paymentData: PlugPagPaymentData): PlugPagPaymentResult {
+        delay(1200)
+        return PlugPagPaymentResult(
+            nsu = paymentData.userReference,
+            authorizationCode = "VOID_OK",
+            cardNumber = "0000",
+            message = "Cancelamento efetuado",
+            result = RET_OK
+        )
     }
 }
 
@@ -87,5 +97,5 @@ class PlugPagPaymentResult(
     val authorizationCode: String,
     val cardNumber: String,
     val message: String,
-    val resultCode: Int
+    val result: Int
 )

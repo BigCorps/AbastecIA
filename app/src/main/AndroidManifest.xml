@@ -33,7 +33,7 @@
         </activity>
 
         <!-- Activity obrigatória do PlugPag: -->
-        <activity android:name="br.com.uol.pagseguro.plugpag.PlugPagActivity" />
+        <activity android:name="br.uol.pagseguro.plugpag.PlugPagActivity" />
 
     </application>
 

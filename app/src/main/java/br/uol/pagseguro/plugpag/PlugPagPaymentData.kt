@@ -1,4 +1,4 @@
-package br.com.uol.pagseguro.plugpag
+package br.uol.pagseguro.plugpag
 
 class PlugPagPaymentData(
     val type: Int,
