@@ -2,11 +2,12 @@ package com.abastecia.frentista.domain.usecase
 
 import com.abastecia.frentista.data.model.PaymentResult
 import com.abastecia.frentista.data.repository.OrderRepository
+import com.abastecia.frentista.data.repository.IPlugPagRepository
 import com.abastecia.frentista.data.repository.PlugPagRepository
 import javax.inject.Inject
 
 class ProcessPaymentUseCase @Inject constructor(
-    private val plugPagRepository: PlugPagRepository,
+    private val plugPagRepository: IPlugPagRepository,  // interface, não classe concreta
     private val orderRepository: OrderRepository
 ) {
     suspend operator fun invoke(

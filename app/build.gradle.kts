@@ -122,8 +122,8 @@ dependencies {
   "kapt"(libs.hilt.compiler)
   implementation(libs.hilt.navigation.compose)
 
-  // PlugPag SDK
-  // Removed external dependency to use self-contained local mock package under br.uol.pagseguro.plugpag
+  // PlugPag SDK real — NÃO criar classes locais. Comente para usar simulação do IPlugPagRepository, descomente se tiver acesso homologado
+  // implementation("br.uol.pagseguro.client:plugpag:3.27.0")
 
   // Core & Splashscreen
   implementation(libs.androidx.core.splashscreen)

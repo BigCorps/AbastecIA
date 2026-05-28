@@ -5,4 +5,6 @@ plugins {
   alias(libs.plugins.roborazzi) apply false
   alias(libs.plugins.secrets) apply false
   alias(libs.plugins.hilt) apply false
+  kotlin("android") version "2.0.21" apply false
+  kotlin("kapt") version "2.0.21" apply false
 }

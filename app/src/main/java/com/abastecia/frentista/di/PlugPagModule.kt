@@ -1,24 +1,20 @@
 package com.abastecia.frentista.di
 
-import android.content.Context
-import br.uol.pagseguro.plugpag.PlugPag
-import br.uol.pagseguro.plugpag.PlugPagAppIdentification
+import com.abastecia.frentista.data.repository.FakePlugPagRepository
+import com.abastecia.frentista.data.repository.IPlugPagRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object PlugPagModule {
+abstract class PlugPagModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun providePlugPag(@ApplicationContext context: Context): PlugPag =
-        PlugPag(
-            context,
-            PlugPagAppIdentification("AbastecIA", "1.0.0")
-        )
+    abstract fun bindPlugPagRepository(
+        fake: FakePlugPagRepository
+    ): IPlugPagRepository
 }

@@ -19,6 +19,10 @@ dependencyResolutionManagement {
   repositories {
     google()
     mavenCentral()
+    // Se você tiver acesso homologado ao SDK real, descomente o bloco abaixo:
+    // maven {
+    //   url = uri("https://raw.githubusercontent.com/pagseguromaster/plugpag/master-3.x/android")
+    // }
   }
 }
 
