@@ -19,7 +19,7 @@ dependencyResolutionManagement {
   repositories {
     google()
     mavenCentral()
-    maven { url = uri("https://github.com/pagseguromaster/plugpag/raw/master/3.x/android") }
+    maven { url = uri("https://raw.githubusercontent.com/pagseguromaster/plugpag/master-3.x/android") }
   }
 }
 

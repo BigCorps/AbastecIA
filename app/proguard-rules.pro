@@ -19,3 +19,20 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Supabase / Ktor
+-keep class io.github.jan.supabase.** { *; }
+-keep class io.ktor.** { *; }
+-dontwarn io.ktor.**
+
+# PlugPag
+-keep class br.uol.pagseguro.** { *; }
+-keep class br.com.uol.pagseguro.** { *; }
+-dontwarn br.uol.pagseguro.**
+
+# Kotlin Serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class com.abastecia.frentista.data.model.** { *; }
+
