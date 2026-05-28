@@ -2,7 +2,38 @@
 
 O **abastecIA** é o aplicativo nativo Android desenvolvido em Kotlin e Jetpack Compose para automação operacional de postos de combustível. 
 
-Ele é projetado para rodar **diretamente nos Smart POS (terminais inteligentes de pagamento/maquininhas)** do PagBank. Ao receber comandos de pagamento em tempo real a partir de uma fila de atendimento sincronizada no **Supabase**, o frentista pode iniciar cobranças físicas de forma direta e integrada no terminal via SDK **PlugPag**, atualizando o status de volta no banco de dados automaticamente.
+Ele é projetado para rodar **diretamente nos Smart POS (terminais inteligentes de pagamento/maquininhas)** do PagBank ou em dispositivos móveis dos caixas e clientes. Com arquitetura multi-perfil unificada neste demonstrador, ele permite alternar e testar virtualmente os três principais papéis/APKs da cadeia de suprimento: **Frentista**, **Caixa**, e **Cliente**.
+
+---
+
+## 🛠️ Simulador Integrado Multi-APK (Como Testar os 3 Papéis)
+
+Para facilitar a validação e demonstração de ponta a ponta sem requerer três dispositivos físicos separados, o aplicativo unifica os três perfis em barras alternáveis no topo da tela:
+
+1. **Maquininha Frentista (Smart POS):** 
+   - Recebe a fila de atendimento em tempo real.
+   - Fornece botões para cobrar fisicamente aproximando/inserindo cartão de crédito/débito ou Pix/Dinheiro via emulador de terminal PagBank (`PlugPag`).
+   - Identifica imediatamente quando o cliente realiza o autopagamento pelo celular, mudando o botão de cobrança para **"IMPRIMIR COMPROVANTE & LIBERAR"** em cor verde chamativa, dispensando nova cobrança física.
+   
+2. **Dashboard do Caixa:**
+   - Tela de controle dedicada para o operador do escritório/caixa central.
+   - Permite monitorar e disparar comandos de faturamento do bico (ex: registrar litros e valor) direto para as maquininhas dos frentistas na pista de forma instantânea.
+   
+3. **App Cliente Pay:**
+   - Emula a tela do celular do motorista utilizando o aplicativo **AbastecIA**.
+   - Conectado em tempo real, ele detecta quando o veículo está parado no bico associado.
+   - Permite escolher a forma de pagamento (Saldo Digital ou PIX estático/dinâmico) e pagar diretamente pelo celular.
+   - Assim que pressionado, o Realtime avisa o terminal do frentista na pista que a bomba correspondente já foi faturada e está livre para abastecer.
+
+---
+
+## 🔐 Segurança & Arquitetura de Login do Operador
+
+Atendendo a estritas diretrizes de compliance corporativo e segurança PCI, **as chaves sensíveis e URLs brutas do Supabase não são expostas nem editadas na tela do frentista**.
+
+- **Conexão Blindada no Servidor:** O projeto é preparado para receber as credenciais e conexões tratadas de forma isolada pela API Gateway/Backend.
+- **Portas de Acesso Customizadas:** Ao logar com e-mail e senha corporativa, o Microsserviço de autenticação associa dinamicamente o usuário ao seu banco de dados privado e ao ID do Posto operacional (`company_id`), carregando as filas em tempo real de forma blindada na interface.
+- **Acesso Rápido de Demonstração:** Na tela de Login inicial, utilize os botões rápidos (`gerente` ou `operador.sul`) para saltar de forma prática para o demonstrador.
 
 ---
 

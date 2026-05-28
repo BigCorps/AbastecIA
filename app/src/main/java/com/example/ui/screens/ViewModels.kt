@@ -43,6 +43,37 @@ class ConfigViewModel(
     private val _pairedDevices = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val pairedDevices: StateFlow<List<Pair<String, String>>> = _pairedDevices
 
+    // Login and Profile Management Setup (Secure Backend simulation)
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    private val _selectedProfile = MutableStateFlow("frentista") // "frentista", "caixa", "cliente"
+    val selectedProfile: StateFlow<String> = _selectedProfile.asStateFlow()
+
+    private val _userEmail = MutableStateFlow("")
+    val userEmail: StateFlow<String> = _userEmail.asStateFlow()
+
+    fun login(email: String, pass: String) {
+        _userEmail.value = email
+        _isLoggedIn.value = true
+        // Automatically fetch database/tenant ID based on user email
+        val inferredCompanyId = when {
+            email.contains("zona-sul") -> "posto-zona-sul-02"
+            email.contains("posto-rio") -> "posto-rio-center"
+            else -> "posto-sede-v1"
+        }
+        updateCompanyId(inferredCompanyId)
+    }
+
+    fun logout() {
+        _isLoggedIn.value = false
+        _userEmail.value = ""
+    }
+
+    fun updateSelectedProfile(profile: String) {
+        _selectedProfile.value = profile
+    }
+
     fun loadPairedDevices(context: Context) {
         _pairedDevices.value = BluetoothUtil.getPairedDevices(context)
     }
@@ -110,6 +141,20 @@ class PainelViewModel(
     fun executeActionConcluir(orderId: String) {
         viewModelScope.launch {
             repository.updateOrderStatus(orderId, "done")
+        }
+    }
+
+    fun payFromClientApp(orderId: String, isPix: Boolean) {
+        viewModelScope.launch {
+            val method = if (isPix) "App PIX" else "Saldo App"
+            val nsu = "APP-${if (isPix) "PIX" else "SLD"}-${(100000..999999).random()}"
+            repository.updateOrderStatus(
+                orderId = orderId,
+                status = "paid_client_app",
+                nsu = nsu,
+                auth = "OK_CLIENT_APP",
+                cardLast4 = if (isPix) "PIX" else "SLD"
+            )
         }
     }
 

@@ -10,7 +10,7 @@ class ObservePendingOrdersUseCase(
 ) {
     fun execute(companyId: String): Flow<List<FuelOrder>> {
         return repository.orders.map { orders ->
-            orders.filter { it.company_id == companyId && it.status == "paid" }
+            orders.filter { it.company_id == companyId && (it.status == "paid" || it.status == "paid_client_app") }
         }
     }
 }
