@@ -6,8 +6,14 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.realtime
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,14 +33,34 @@ class OrderRepository @Inject constructor(
             .decodeList()
 
     // Escutar novos pedidos em tempo real
-    fun observeOrders(companyId: String): Flow<List<FuelOrder>> {
-        val channel = supabase.channel("fuel_orders_$companyId")
-        return channel
-            .postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = "fuel_orders"
-                filter = "company_id=eq.$companyId"
+    fun observeOrders(companyId: String): Flow<List<FuelOrder>> = callbackFlow {
+        // Buscar dados iniciais imediatamente
+        val initial = getPaidOrders(companyId)
+        trySend(initial)
+
+        // Criar e subscrever o channel
+        val channel = supabase.channel("fuel_orders_$companyId") {
+            // Sem configuração extra necessária
+        }
+
+        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "fuel_orders"
+            filter = "company_id=eq.$companyId"
+        }.onEach {
+            // A cada mudança, rebuscar a lista atualizada
+            val updated = getPaidOrders(companyId)
+            trySend(updated)
+        }.launchIn(this)
+
+        // CRÍTICO: subscrever o channel
+        channel.subscribe()
+
+        // Limpar ao fechar o Flow
+        awaitClose {
+            launch(NonCancellable) {
+                supabase.realtime.removeChannel(channel)
             }
-            .map { getPaidOrders(companyId) }
+        }
     }
 
     // Atualizar status após pagamento na maquininha
