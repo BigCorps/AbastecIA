@@ -8,6 +8,7 @@ plugins {
   alias(libs.plugins.roborazzi)
   alias(libs.plugins.secrets)
   alias(libs.plugins.hilt)
+  alias(libs.plugins.kotlin.serialization)
   kotlin("kapt")
 }
 

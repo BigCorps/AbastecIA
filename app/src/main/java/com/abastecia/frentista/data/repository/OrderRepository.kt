@@ -37,6 +37,9 @@ class OrderRepository @Inject constructor(
     // Escutar novos pedidos em tempo real
     fun observeOrders(companyId: String): Flow<List<FuelOrder>> = callbackFlow {
         val supabase = supabaseProvider.getClient()
+        // Garantir que a conexão do websockets em tempo real esteja ativa
+        supabase.realtime.connect()
+
         // Buscar dados iniciais imediatamente
         val initial = getPaidOrders(companyId)
         trySend(initial)
