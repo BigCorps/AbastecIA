@@ -19,6 +19,7 @@ import com.abastecia.frentista.data.repository.PlugPagRepository
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PainelScreen(
+    onNavigateToConfig: () -> Unit,
     viewModel: PainelViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -29,6 +30,9 @@ fun PainelScreen(
             TopAppBar(
                 title = { Text("abastecIA — Painel do Frentista") },
                 actions = {
+                    IconButton(onClick = onNavigateToConfig) {
+                        Icon(Icons.Default.Settings, contentDescription = "Configurações")
+                    }
                     Icon(
                         imageVector = if (state.isConnected)
                             Icons.Default.WifiTethering else Icons.Default.WifiOff,

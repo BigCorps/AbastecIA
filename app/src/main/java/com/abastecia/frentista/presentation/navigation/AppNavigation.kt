@@ -27,7 +27,11 @@ fun AppNavigation(startDestination: String = Screen.Painel.route) {
             )
         }
         composable(Screen.Painel.route) {
-            PainelScreen()
+            PainelScreen(
+                onNavigateToConfig = {
+                    navController.navigate(Screen.Config.route)
+                }
+            )
         }
     }
 }
