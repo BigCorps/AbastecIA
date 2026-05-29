@@ -23,15 +23,23 @@ class OrderRepository @Inject constructor(
 ) {
     // Buscar pedidos pagos aguardando cobrança na maquininha
     suspend fun getPaidOrders(companyId: String): List<FuelOrder> {
-        val supabase = supabaseProvider.getClient()
-        return supabase.from("fuel_orders")
-            .select {
-                filter {
-                    eq("company_id", companyId)
-                    eq("status", "paid")
+        return try {
+            val supabase = supabaseProvider.getClient()
+            val result = supabase.from("fuel_orders")
+                .select {
+                    filter {
+                        eq("company_id", companyId)
+                        eq("status", "paid")
+                    }
                 }
-            }
-            .decodeList()
+            android.util.Log.d("OrderRepo", "Raw JSON: ${result.data}")
+            val list = result.decodeList<FuelOrder>()
+            android.util.Log.d("OrderRepo", "Decoded ${list.size} orders")
+            list
+        } catch (e: Exception) {
+            android.util.Log.e("OrderRepo", "ERRO: ${e.message}", e)
+            emptyList()
+        }
     }
 
     // Escutar novos pedidos em tempo real
