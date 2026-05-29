@@ -8,6 +8,7 @@ import com.abastecia.frentista.data.repository.OrderRepository
 import com.abastecia.frentista.domain.usecase.ObservePaidOrdersUseCase
 import com.abastecia.frentista.domain.usecase.ProcessPaymentUseCase
 import com.abastecia.frentista.data.repository.PlugPagRepository
+import com.abastecia.frentista.BuildConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -46,13 +47,24 @@ class PainelViewModel @Inject constructor(
     private fun startObserving() {
         viewModelScope.launch {
             preferences.companyId.collectLatest { companyId ->
-                if (companyId.isBlank()) return@collectLatest
+                if (companyId.isBlank()
+                    || companyId == BuildConfig.COMPANY_ID_DEFAULT) {
+                    // Credenciais não configuradas — parar loading
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        isConnected = false,
+                        errorMessage = "Configure as credenciais do posto primeiro"
+                    )}
+                    return@collectLatest
+                }
+
                 _uiState.update { it.copy(isConnected = true) }
+
                 observePaidOrders(companyId)
                     .catch { e ->
                         _uiState.update { it.copy(
                             isConnected = false,
-                            errorMessage = e.message,
+                            errorMessage = "Erro de conexão: ${e.message}",
                             isLoading = false
                         )}
                     }
