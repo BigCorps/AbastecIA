@@ -23,7 +23,7 @@ class OrderRepository @Inject constructor(
 ) {
     // Buscar pedidos pagos aguardando cobrança na maquininha
     suspend fun getPaidOrders(companyId: String): List<FuelOrder> {
-        return try {
+        try {
             val supabase = supabaseProvider.getClient()
             val result = supabase.from("fuel_orders")
                 .select {
@@ -35,10 +35,10 @@ class OrderRepository @Inject constructor(
             android.util.Log.d("OrderRepo", "Raw JSON: ${result.data}")
             val list = result.decodeList<FuelOrder>()
             android.util.Log.d("OrderRepo", "Decoded ${list.size} orders")
-            list
+            return list
         } catch (e: Exception) {
             android.util.Log.e("OrderRepo", "ERRO: ${e.message}", e)
-            emptyList()
+            throw e
         }
     }
 

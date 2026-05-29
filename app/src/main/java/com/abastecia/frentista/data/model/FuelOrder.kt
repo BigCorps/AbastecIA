@@ -12,11 +12,11 @@ data class FuelOrder(
     val amount: Double,
     val status: String,
     val plate: String? = null,
-    @SerialName("payment_method") val paymentMethod: String = "card",
+    @SerialName("payment_method") val paymentMethod: String? = "card",
     @SerialName("plugpag_nsu") val plugpagNsu: String? = null,
     @SerialName("plugpag_auth") val plugpagAuth: String? = null,
     @SerialName("plugpag_card_last4") val plugpagCardLast4: String? = null,
-    @SerialName("plugpag_installments") val plugpagInstallments: Int = 1,
+    @SerialName("plugpag_installments") val plugpagInstallments: Int? = 1,
     @SerialName("paid_at") val paidAt: String? = null,
     @SerialName("created_at") val createdAt: String? = null
 )
