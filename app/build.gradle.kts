@@ -73,6 +73,8 @@ android {
   }
   kotlinOptions {
     jvmTarget = "17"
+    languageVersion = "2.0"
+    apiVersion = "2.0"
   }
   buildFeatures {
     compose = true
@@ -91,6 +93,17 @@ secrets {
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  constraints {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib") { version { strictly("2.0.21") } }
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8") { version { strictly("2.0.21") } }
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7") { version { strictly("2.0.21") } }
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-common") { version { strictly("2.0.21") } }
+
+    kapt("org.jetbrains.kotlin:kotlin-stdlib") { version { strictly("2.0.21") } }
+    kapt("org.jetbrains.kotlin:kotlin-stdlib-jdk8") { version { strictly("2.0.21") } }
+    kapt("org.jetbrains.kotlin:kotlin-stdlib-jdk7") { version { strictly("2.0.21") } }
+    kapt("org.jetbrains.kotlin:kotlin-stdlib-common") { version { strictly("2.0.21") } }
+  }
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
   implementation(libs.androidx.activity.compose)
@@ -149,3 +162,14 @@ dependencies {
 kapt {
   correctErrorTypes = true
 }
+
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21")
+        force("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
+    }
+}
+
