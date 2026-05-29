@@ -1,7 +1,7 @@
 package com.abastecia.frentista.data.repository
 
+import com.abastecia.frentista.data.api.SupabaseProvider
 import com.abastecia.frentista.data.model.FuelOrder
-import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
@@ -19,11 +19,12 @@ import javax.inject.Singleton
 
 @Singleton
 class OrderRepository @Inject constructor(
-    private val supabase: SupabaseClient
+    private val supabaseProvider: SupabaseProvider
 ) {
     // Buscar pedidos pagos aguardando cobrança na maquininha
-    suspend fun getPaidOrders(companyId: String): List<FuelOrder> =
-        supabase.from("fuel_orders")
+    suspend fun getPaidOrders(companyId: String): List<FuelOrder> {
+        val supabase = supabaseProvider.getClient()
+        return supabase.from("fuel_orders")
             .select {
                 filter {
                     eq("company_id", companyId)
@@ -31,9 +32,11 @@ class OrderRepository @Inject constructor(
                 }
             }
             .decodeList()
+    }
 
     // Escutar novos pedidos em tempo real
     fun observeOrders(companyId: String): Flow<List<FuelOrder>> = callbackFlow {
+        val supabase = supabaseProvider.getClient()
         // Buscar dados iniciais imediatamente
         val initial = getPaidOrders(companyId)
         trySend(initial)
@@ -71,6 +74,7 @@ class OrderRepository @Inject constructor(
         cardLast4: String?,
         installments: Int
     ) {
+        val supabase = supabaseProvider.getClient()
         supabase.from("fuel_orders").update({
             set("status", "paid_machine")
             set("plugpag_nsu", nsu)
@@ -85,6 +89,7 @@ class OrderRepository @Inject constructor(
 
     // Finalizar abastecimento
     suspend fun markAsDone(orderId: String) {
+        val supabase = supabaseProvider.getClient()
         supabase.from("fuel_orders").update({
             set("status", "done")
         }) {

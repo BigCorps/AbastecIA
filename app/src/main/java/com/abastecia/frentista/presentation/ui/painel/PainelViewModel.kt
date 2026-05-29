@@ -46,9 +46,16 @@ class PainelViewModel @Inject constructor(
 
     private fun startObserving() {
         viewModelScope.launch {
-            preferences.companyId.collectLatest { companyId ->
-                if (companyId.isBlank()
-                    || companyId == BuildConfig.COMPANY_ID_DEFAULT) {
+            combine(preferences.companyId, preferences.supabaseUrl) { id, url ->
+                id to url
+            }.collectLatest { (companyId, supabaseUrl) ->
+                val isConfigured = companyId.isNotBlank()
+                    && supabaseUrl.isNotBlank()
+                    && !supabaseUrl.contains("dummy")
+                    && supabaseUrl.startsWith("https://")
+                    && !supabaseUrl.contains("dummy.supabase.co")
+
+                if (!isConfigured) {
                     // Credenciais não configuradas — parar loading
                     _uiState.update { it.copy(
                         isLoading = false,
