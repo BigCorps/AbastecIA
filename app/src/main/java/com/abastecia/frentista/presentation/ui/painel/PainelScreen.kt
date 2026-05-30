@@ -3,6 +3,10 @@ package com.abastecia.frentista.presentation.ui.painel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,26 +24,17 @@ import com.abastecia.frentista.data.repository.PlugPagRepository
 @Composable
 fun PainelScreen(
     onNavigateToConfig: () -> Unit,
-    onNavigateToDebug: () -> Unit,
     viewModel: PainelViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
     var showPaymentDialog by remember { mutableStateOf<FuelOrder?>(null) }
+    var showDirectSaleDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("abastecIA — Painel do Frentista") },
                 actions = {
-                    if (com.abastecia.frentista.BuildConfig.DEBUG) {
-                        IconButton(onClick = onNavigateToDebug) {
-                            Icon(
-                                Icons.Default.BugReport,
-                                contentDescription = "Debug",
-                                tint = Color(0xFFFFA500)
-                            )
-                        }
-                    }
                     IconButton(onClick = onNavigateToConfig) {
                         Icon(Icons.Default.Settings, contentDescription = "Configurações")
                     }
@@ -51,6 +46,15 @@ fun PainelScreen(
                     )
                     Spacer(Modifier.width(12.dp))
                 }
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { showDirectSaleDialog = true },
+                icon = { Icon(Icons.Default.Add, "Venda direta") },
+                text = { Text("Venda Direta") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
         }
     ) { padding ->
@@ -92,10 +96,22 @@ fun PainelScreen(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
                     action = {
                         TextButton(onClick = {
-                            viewModel.onEvent(PainelEvent.DismissError())
+                            viewModel.onEvent(PainelEvent.DismissError)
                         }) { Text("OK") }
                     }
                 ) { Text(msg) }
+            }
+
+            state.successMessage?.let { msg ->
+                Snackbar(
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+                    containerColor = Color(0xFF22C55E),
+                    action = {
+                        TextButton(onClick = {
+                            viewModel.onEvent(PainelEvent.DismissSuccess)
+                        }) { Text("OK", color = Color.White) }
+                    }
+                ) { Text(msg, color = Color.White) }
             }
         }
     }
@@ -108,6 +124,16 @@ fun PainelScreen(
                 showPaymentDialog = null
             },
             onDismiss = { showPaymentDialog = null }
+        )
+    }
+
+    if (showDirectSaleDialog) {
+        DirectSaleDialog(
+            onConfirm = { pump, fuel, amount, paymentMethod, installments ->
+                viewModel.onEvent(PainelEvent.CreateDirectSale(pump, fuel, amount, paymentMethod, installments))
+                showDirectSaleDialog = false
+            },
+            onDismiss = { showDirectSaleDialog = false }
         )
     }
 }
@@ -255,6 +281,134 @@ fun PaymentTypeDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
+}
+
+@Composable
+fun DirectSaleDialog(
+    onConfirm: (pump: String, fuel: String, amount: Double, paymentMethod: String, installments: Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var pumpNumber by remember { mutableStateOf("") }
+    var fuelType by remember { mutableStateOf("Gasolina Comum") }
+    var amountText by remember { mutableStateOf("") }
+    var paymentMethod by remember { mutableStateOf("card_debit") }
+    var installments by remember { mutableIntStateOf(1) }
+
+    val fuelTypes = listOf("Gasolina Comum", "Gasolina Aditivada", "Etanol", "Diesel S10")
+    val paymentMethods = listOf(
+        "card_debit" to "Cartão de Débito",
+        "card_credit" to "Cartão de Crédito",
+        "pix" to "Pix",
+        "cash" to "Dinheiro"
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Nova Venda Direta", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = pumpNumber,
+                    onValueChange = { pumpNumber = it },
+                    label = { Text("Número da Bomba") },
+                    placeholder = { Text("Ex: 2") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = amountText,
+                    onValueChange = { amountText = it },
+                    label = { Text("Valor (R$)") },
+                    placeholder = { Text("0.00") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Text("Combustível:", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    fuelTypes.forEach { fuel ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                        ) {
+                            RadioButton(
+                                selected = fuelType == fuel,
+                                onClick = { fuelType = fuel }
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(fuel, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+
+                Text("Forma de Pagamento:", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    paymentMethods.forEach { (method, label) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                        ) {
+                            RadioButton(
+                                selected = paymentMethod == method,
+                                onClick = { paymentMethod = method }
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(label, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+
+                if (paymentMethod == "card_credit") {
+                    Text("Parcelas:", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        listOf(1, 2, 3, 6, 12).forEach { n ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                            ) {
+                                RadioButton(
+                                    selected = installments == n,
+                                    onClick = { installments = n }
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(if (n == 1) "À vista" else "${n}x", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            val amount = amountText.toDoubleOrNull() ?: 0.0
+            Button(
+                onClick = {
+                    onConfirm(pumpNumber, fuelType, amount, paymentMethod, installments)
+                },
+                enabled = pumpNumber.isNotBlank() && amount > 0.0
+            ) {
+                Text("Confirmar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
         }
     )
 }

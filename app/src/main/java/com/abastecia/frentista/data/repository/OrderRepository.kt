@@ -30,7 +30,7 @@ class OrderRepository @Inject constructor(
                 .select {
                     filter {
                         eq("company_id", companyId)
-                        eq("status", "paid")
+                        neq("status", "done")
                     }
                 }
             AppLogger.d("OrderRepo", "Raw JSON: ${result.data}")
@@ -120,5 +120,13 @@ class OrderRepository @Inject constructor(
             filter { eq("id", orderId) }
         }
         AppLogger.d("OrderRepo", "Pedido $orderId finalizado com sucesso")
+    }
+
+    // Inserir novo pedido pago diretamente
+    suspend fun createDirectOrder(order: FuelOrder) {
+        AppLogger.d("OrderRepo", "Inserindo pedido direto: ${order.id}")
+        val supabase = supabaseProvider.getClient()
+        supabase.from("fuel_orders").insert(order)
+        AppLogger.d("OrderRepo", "Pedido direto inserido com sucesso")
     }
 }
