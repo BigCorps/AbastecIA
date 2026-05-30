@@ -22,30 +22,21 @@ fun ConfigScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Configurações do Terminal",
-            style = MaterialTheme.typography.headlineSmall)
-
-        OutlinedTextField(
-            value = state.supabaseUrl,
-            onValueChange = viewModel::onUrlChange,
-            label = { Text("URL do Supabase") },
-            placeholder = { Text("https://xxx.supabase.co") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+        Text(
+            "Configuração do Terminal",
+            style = MaterialTheme.typography.headlineSmall
         )
-
-        OutlinedTextField(
-            value = state.supabaseKey,
-            onValueChange = viewModel::onKeyChange,
-            label = { Text("Anon Key") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+        Text(
+            "Informe os dados desta instalação:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         OutlinedTextField(
             value = state.companyId,
             onValueChange = viewModel::onCompanyIdChange,
-            label = { Text("ID do Posto (company_id)") },
+            label = { Text("ID do Posto") },
+            placeholder = { Text("Ex: posto_piloto_01") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -54,10 +45,12 @@ fun ConfigScreen(
             value = state.pumpNumber,
             onValueChange = viewModel::onPumpNumberChange,
             label = { Text("Número desta Bomba") },
-            placeholder = { Text("01") },
+            placeholder = { Text("Ex: 01") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            )
         )
 
         Button(

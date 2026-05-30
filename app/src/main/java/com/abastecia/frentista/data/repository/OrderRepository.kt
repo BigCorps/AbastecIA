@@ -2,6 +2,7 @@ package com.abastecia.frentista.data.repository
 
 import com.abastecia.frentista.data.api.SupabaseProvider
 import com.abastecia.frentista.data.model.FuelOrder
+import com.abastecia.frentista.presentation.ui.debug.AppLogger
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
@@ -32,21 +33,23 @@ class OrderRepository @Inject constructor(
                         eq("status", "paid")
                     }
                 }
-            android.util.Log.d("OrderRepo", "Raw JSON: ${result.data}")
+            AppLogger.d("OrderRepo", "Raw JSON: ${result.data}")
             val list = result.decodeList<FuelOrder>()
-            android.util.Log.d("OrderRepo", "Decoded ${list.size} orders")
+            AppLogger.d("OrderRepo", "Decoded ${list.size} orders")
             return list
         } catch (e: Exception) {
-            android.util.Log.e("OrderRepo", "ERRO: ${e.message}", e)
+            AppLogger.e("OrderRepo", "ERRO: ${e.message ?: "desconhecido"}")
             throw e
         }
     }
 
     // Escutar novos pedidos em tempo real
     fun observeOrders(companyId: String): Flow<List<FuelOrder>> = callbackFlow {
+        AppLogger.d("OrderRepo", "Iniciando escuta em tempo real para o posto: $companyId")
         val supabase = supabaseProvider.getClient()
         // Garantir que a conexão do websockets em tempo real esteja ativa
         supabase.realtime.connect()
+        AppLogger.d("OrderRepo", "Conexão Realtime iniciada")
 
         // Buscar dados iniciais imediatamente
         val initial = getPaidOrders(companyId)
@@ -60,7 +63,8 @@ class OrderRepository @Inject constructor(
         channel.postgresChangeFlow<PostgresAction>(schema = "public") {
             table = "fuel_orders"
             filter = "company_id=eq.$companyId"
-        }.onEach {
+        }.onEach { action ->
+            AppLogger.d("OrderRepo", "Mudança recebida via Realtime: $action")
             // A cada mudança, rebuscar a lista atualizada
             val updated = getPaidOrders(companyId)
             trySend(updated)
@@ -68,9 +72,11 @@ class OrderRepository @Inject constructor(
 
         // CRÍTICO: subscrever o channel
         channel.subscribe()
+        AppLogger.d("OrderRepo", "Inscrito no canal de alterações em tempo real")
 
         // Limpar ao fechar o Flow
         awaitClose {
+            AppLogger.d("OrderRepo", "Fechando conexão em tempo real da bomba")
             launch(NonCancellable) {
                 supabase.realtime.removeChannel(channel)
             }
@@ -85,6 +91,7 @@ class OrderRepository @Inject constructor(
         cardLast4: String?,
         installments: Int
     ) {
+        AppLogger.d("OrderRepo", "Atualizando pedido $orderId após sucesso no PlugPag (NSU: $nsu)")
         val supabase = supabaseProvider.getClient()
         supabase.from("fuel_orders").update({
             set("status", "paid_machine")
@@ -96,15 +103,18 @@ class OrderRepository @Inject constructor(
         }) {
             filter { eq("id", orderId) }
         }
+        AppLogger.d("OrderRepo", "Pedido $orderId atualizado com sucesso no banco")
     }
 
     // Finalizar abastecimento
     suspend fun markAsDone(orderId: String) {
+        AppLogger.d("OrderRepo", "Finalizando abastecimento para pedido $orderId")
         val supabase = supabaseProvider.getClient()
         supabase.from("fuel_orders").update({
             set("status", "done")
         }) {
             filter { eq("id", orderId) }
         }
+        AppLogger.d("OrderRepo", "Pedido $orderId finalizado com sucesso")
     }
 }

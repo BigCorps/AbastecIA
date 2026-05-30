@@ -25,19 +25,19 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-    // Ler credenciais do secrets.properties ou .env
-    val secretsFile = rootProject.file("secrets.properties")
-    if (secretsFile.exists()) {
-        val props = Properties().apply { secretsFile.inputStream().use { load(it) } }
-        buildConfigField("String", "SUPABASE_URL", "\"${props.getProperty("SUPABASE_URL")}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${props.getProperty("SUPABASE_ANON_KEY")}\"")
-        buildConfigField("String", "COMPANY_ID_DEFAULT", "\"${props.getProperty("COMPANY_ID_DEFAULT")}\"")
-    } else {
-        // Fallback to default BuildConfig fields which secrets plugin might populate, or empty if not set
-        buildConfigField("String", "SUPABASE_URL", "\"\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"\"")
-        buildConfigField("String", "COMPANY_ID_DEFAULT", "\"posto_piloto_01\"")
-    }
+    // Ler credenciais do env
+    buildConfigField(
+        "String", "SUPABASE_URL",
+        "\"${System.getenv("SUPABASE_URL") ?: ""}\""
+    )
+    buildConfigField(
+        "String", "SUPABASE_ANON_KEY",
+        "\"${System.getenv("SUPABASE_ANON_KEY") ?: ""}\""
+    )
+    buildConfigField(
+        "String", "COMPANY_ID_DEFAULT",
+        "\"\"" // vazio — usuário preenche na tela
+    )
   }
 
   signingConfigs {

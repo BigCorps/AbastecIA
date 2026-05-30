@@ -20,6 +20,7 @@ import com.abastecia.frentista.data.repository.PlugPagRepository
 @Composable
 fun PainelScreen(
     onNavigateToConfig: () -> Unit,
+    onNavigateToDebug: () -> Unit,
     viewModel: PainelViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -30,6 +31,15 @@ fun PainelScreen(
             TopAppBar(
                 title = { Text("abastecIA — Painel do Frentista") },
                 actions = {
+                    if (com.abastecia.frentista.BuildConfig.DEBUG) {
+                        IconButton(onClick = onNavigateToDebug) {
+                            Icon(
+                                Icons.Default.BugReport,
+                                contentDescription = "Debug",
+                                tint = Color(0xFFFFA500)
+                            )
+                        }
+                    }
                     IconButton(onClick = onNavigateToConfig) {
                         Icon(Icons.Default.Settings, contentDescription = "Configurações")
                     }

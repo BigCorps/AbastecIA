@@ -22,16 +22,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val supabaseUrl = runBlocking { preferences.supabaseUrl.first() }
         val companyId   = runBlocking { preferences.companyId.first() }
 
-        // Só vai para o Painel se tiver URL real configurada
-        // URL dummy ou vazia = ir para Config primeiro
+        // Só vai para o Painel se tiver ID do posto configurado e URL no BuildConfig
         val isConfigured = companyId.isNotBlank()
-            && supabaseUrl.isNotBlank()
-            && !supabaseUrl.contains("dummy")
-            && supabaseUrl.startsWith("https://")
-            && !supabaseUrl.contains("dummy.supabase.co")
+            && companyId != "posto_piloto_01" // não usar default
+            && BuildConfig.SUPABASE_URL.isNotBlank()
 
         val startDest = if (isConfigured) Screen.Painel.route else Screen.Config.route
 
