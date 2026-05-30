@@ -9,7 +9,9 @@ import com.abastecia.frentista.domain.usecase.ObservePaidOrdersUseCase
 import com.abastecia.frentista.domain.usecase.ProcessPaymentUseCase
 import com.abastecia.frentista.data.repository.PlugPagRepository
 import com.abastecia.frentista.BuildConfig
+import com.abastecia.frentista.presentation.ui.debug.AppLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,31 +46,33 @@ class PainelViewModel @Inject constructor(
         startObserving()
     }
 
+    private var observingJob: Job? = null
+
     private fun startObserving() {
         viewModelScope.launch {
-            combine(preferences.companyId, preferences.supabaseUrl) { id, url ->
-                id to url
-            }.collectLatest { (companyId, supabaseUrl) ->
-                val isConfigured = companyId.isNotBlank()
-                    && supabaseUrl.isNotBlank()
-                    && !supabaseUrl.contains("dummy")
-                    && supabaseUrl.startsWith("https://")
-                    && !supabaseUrl.contains("dummy.supabase.co")
+            // Ler companyId apenas UMA vez — não observar continuamente
+            val companyId = preferences.companyId.first()
 
-                if (!isConfigured) {
-                    // Credenciais não configuradas — parar loading
-                    _uiState.update { it.copy(
-                        isLoading = false,
-                        isConnected = false,
-                        errorMessage = "Configure as credenciais do posto primeiro"
-                    )}
-                    return@collectLatest
-                }
+            if (companyId.isBlank()
+                || BuildConfig.SUPABASE_URL.isBlank()
+                || BuildConfig.SUPABASE_URL.contains("dummy")) {
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    isConnected = false,
+                    errorMessage = "Configure as credenciais do posto primeiro"
+                )}
+                return@launch
+            }
 
-                _uiState.update { it.copy(isConnected = true) }
+            AppLogger.d("PainelVM", "Iniciando observação para: $companyId")
+            _uiState.update { it.copy(isConnected = true) }
 
+            // Iniciar observação uma única vez
+            observingJob?.cancel()
+            observingJob = viewModelScope.launch {
                 observePaidOrders(companyId)
                     .catch { e ->
+                        AppLogger.e("PainelVM", "Erro Realtime: ${e.message}")
                         _uiState.update { it.copy(
                             isConnected = false,
                             errorMessage = "Erro de conexão: ${e.message}",
@@ -76,13 +80,20 @@ class PainelViewModel @Inject constructor(
                         )}
                     }
                     .collect { orders ->
+                        AppLogger.d("PainelVM", "Recebeu ${orders.size} pedidos")
                         _uiState.update { it.copy(
                             orders = orders,
-                            isLoading = false
+                            isLoading = false,
+                            isConnected = true
                         )}
                     }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        observingJob?.cancel()
     }
 
     fun onEvent(event: PainelEvent) {

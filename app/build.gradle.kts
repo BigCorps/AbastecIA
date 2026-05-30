@@ -25,14 +25,20 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-    // Ler credenciais do env
+    // Ler credenciais do env ou usar fallback padrão
+    val envUrl = System.getenv("SUPABASE_URL")
+    val supabaseUrl = if (envUrl.isNullOrEmpty()) "https://qvcvclpsvtktljsvfnly.supabase.co" else envUrl
+
+    val envKey = System.getenv("SUPABASE_ANON_KEY")
+    val supabaseKey = if (envKey.isNullOrEmpty()) "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Y3ZjbHBzdnRrdGxqc3Zmbmx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MjczNjYsImV4cCI6MjA5NTUwMzM2Nn0.A53XI7x1YtCdDAa68jbyIKzVtV9GWGNdV7jxiDmrX7A" else envKey
+
     buildConfigField(
         "String", "SUPABASE_URL",
-        "\"${System.getenv("SUPABASE_URL") ?: ""}\""
+        "\"$supabaseUrl\""
     )
     buildConfigField(
         "String", "SUPABASE_ANON_KEY",
-        "\"${System.getenv("SUPABASE_ANON_KEY") ?: ""}\""
+        "\"$supabaseKey\""
     )
     buildConfigField(
         "String", "COMPANY_ID_DEFAULT",

@@ -19,18 +19,35 @@ import androidx.compose.ui.unit.sp
 object AppLogger {
     private val _logs = mutableStateListOf<LogEntry>()
     val logs: List<LogEntry> get() = _logs
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
 
     fun d(tag: String, message: String) {
-        _logs.add(LogEntry("D", tag, message))
+        val entry = LogEntry("D", tag, message)
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            _logs.add(entry)
+        } else {
+            handler.post { _logs.add(entry) }
+        }
         android.util.Log.d(tag, message)
     }
 
     fun e(tag: String, message: String) {
-        _logs.add(LogEntry("E", tag, message))
+        val entry = LogEntry("E", tag, message)
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            _logs.add(entry)
+        } else {
+            handler.post { _logs.add(entry) }
+        }
         android.util.Log.e(tag, message)
     }
 
-    fun clear() = _logs.clear()
+    fun clear() {
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            _logs.clear()
+        } else {
+            handler.post { _logs.clear() }
+        }
+    }
 }
 
 data class LogEntry(

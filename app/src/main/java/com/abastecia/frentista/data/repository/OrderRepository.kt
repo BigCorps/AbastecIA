@@ -45,41 +45,45 @@ class OrderRepository @Inject constructor(
 
     // Escutar novos pedidos em tempo real
     fun observeOrders(companyId: String): Flow<List<FuelOrder>> = callbackFlow {
-        AppLogger.d("OrderRepo", "Iniciando escuta em tempo real para o posto: $companyId")
+        AppLogger.d("OrderRepo", "Iniciando canal para: $companyId")
+
+        // Buscar dados iniciais
+        val initial = getPaidOrders(companyId)
+        AppLogger.d("OrderRepo", "Dados iniciais: ${initial.size} pedidos")
+        trySend(initial)
+
         val supabase = supabaseProvider.getClient()
         // Garantir que a conexão do websockets em tempo real esteja ativa
         supabase.realtime.connect()
         AppLogger.d("OrderRepo", "Conexão Realtime iniciada")
 
-        // Buscar dados iniciais imediatamente
-        val initial = getPaidOrders(companyId)
-        trySend(initial)
+        // Criar canal Realtime
+        val channel = supabase.channel("fuel_$companyId")
 
-        // Criar e subscrever o channel
-        val channel = supabase.channel("fuel_orders_$companyId") {
-            // Sem configuração extra necessária
-        }
-
-        channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+        val changeFlow = channel.postgresChangeFlow<PostgresAction>(
+            schema = "public"
+        ) {
             table = "fuel_orders"
             filter = "company_id=eq.$companyId"
-        }.onEach { action ->
-            AppLogger.d("OrderRepo", "Mudança recebida via Realtime: $action")
-            // A cada mudança, rebuscar a lista atualizada
+        }
+
+        // Processar mudanças em coroutine separada
+        val job = changeFlow.onEach { action ->
+            AppLogger.d("OrderRepo", "Mudança detectada: ${action::class.simpleName}")
             val updated = getPaidOrders(companyId)
+            AppLogger.d("OrderRepo", "Após mudança: ${updated.size} pedidos")
             trySend(updated)
         }.launchIn(this)
 
-        // CRÍTICO: subscrever o channel
+        // Subscrever APÓS configurar o listener
         channel.subscribe()
-        AppLogger.d("OrderRepo", "Inscrito no canal de alterações em tempo real")
+        AppLogger.d("OrderRepo", "Canal subscrito com sucesso")
 
-        // Limpar ao fechar o Flow
+        // Manter o Flow aberto até ser cancelado
         awaitClose {
-            AppLogger.d("OrderRepo", "Fechando conexão em tempo real da bomba")
-            launch(NonCancellable) {
-                supabase.realtime.removeChannel(channel)
-            }
+            AppLogger.d("OrderRepo", "Fechando canal")
+            job.cancel()
+            launch { supabase.realtime.removeChannel(channel) }
         }
     }
 
