@@ -95,6 +95,8 @@ android {
 secrets {
   propertiesFileName = ".env"
   defaultPropertiesFileName = ".env.example"
+  ignoreList.add("SUPABASE_URL")
+  ignoreList.add("SUPABASE_ANON_KEY")
 }
 
 // Some unused dependencies are commented out below instead of being removed.
