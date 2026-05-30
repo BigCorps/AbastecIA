@@ -6,7 +6,7 @@
 <title>abastecIA — O Sistema Inteligente para Postos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
 <style>
   :root {
     --preto: #080A0C;
@@ -26,7 +26,7 @@
   body {
     background: var(--preto);
     color: var(--texto);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: 16px;
     line-height: 1.6;
     overflow-x: hidden;
@@ -131,9 +131,9 @@
     animation: pulse 2s infinite;
   }
   .hero h1 {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: clamp(2.8rem, 7vw, 5.5rem);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.05;
     color: var(--branco);
     letter-spacing: -2px;
@@ -214,9 +214,9 @@
   .stat-item { text-align: center; padding: 0 24px; }
   .stat-item + .stat-item { border-left: 1px solid var(--borda); }
   .stat-num {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: 2.2rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--branco);
     display: block;
     line-height: 1;
@@ -247,9 +247,9 @@
     text-align: center;
   }
   .section-title {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--branco);
     line-height: 1.15;
     letter-spacing: -1px;
@@ -264,7 +264,6 @@
     text-align: center;
     margin: 0 auto;
   }
-  /* COMO FUNCIONA */
   .flow-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -284,9 +283,9 @@
   }
   .flow-step:hover { background: var(--grafite); }
   .step-num {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: 3rem;
-    font-weight: 800;
+    font-weight: 700;
     color: rgba(30,144,255,0.12);
     line-height: 1;
     margin-bottom: 16px;
@@ -298,14 +297,13 @@
     color: var(--azul);
   }
   .step-title {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: 1rem;
     font-weight: 700;
     color: var(--branco);
     margin-bottom: 8px;
   }
   .step-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
-  /* FUNCIONALIDADES */
   .features-section { background: var(--carbon); }
   .features-header {
     display: flex;
@@ -345,14 +343,13 @@
   }
   .feature-icon svg { width: 100%; height: 100%; }
   .feature-title {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: 1rem;
     font-weight: 700;
     color: var(--branco);
     margin-bottom: 8px;
   }
   .feature-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
-  /* DEMO */
   .demo-section { padding: 80px 40px; }
   .demo-grid {
     display: grid;
@@ -403,7 +400,7 @@
     align-items: center;
     margin-bottom: 12px;
   }
-  .demo-bomba { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--branco); }
+  .demo-bomba { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--branco); }
   .demo-badge {
     font-size: 0.7rem;
     font-weight: 700;
@@ -415,7 +412,7 @@
   .badge-aguardando { background: rgba(255,193,7,0.15); color: #FFC107; }
   .badge-pago { background: rgba(0,230,118,0.15); color: var(--verde); }
   .badge-livre { background: rgba(90,100,114,0.2); color: var(--muted); }
-  .demo-valor { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--branco); margin-bottom: 4px; }
+  .demo-valor { font-family: 'Quicksand', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--branco); margin-bottom: 4px; }
   .demo-info { font-size: 0.8rem; color: var(--muted); }
   .demo-btn {
     width: 100%;
@@ -431,6 +428,7 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+    font-family: 'Quicksand', sans-serif;
   }
   .demo-btn svg { width: 14px; height: 14px; }
   .demo-btn-cobrar { background: var(--azul); color: #fff; }
@@ -448,7 +446,6 @@
   .demo-list li:last-child { border: none; }
   .demo-list .icon { flex-shrink: 0; margin-top: 2px; color: var(--verde); }
   .demo-list .icon svg { width: 18px; height: 18px; }
-  /* PERFIS */
   .profiles-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -473,7 +470,7 @@
   .profile-verde::before { background: var(--verde); }
   .profile-laranja::before { background: var(--laranja); }
   .profile-svg { width: 40px; height: 40px; margin-bottom: 16px; display: block; }
-  .profile-nome { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--branco); margin-bottom: 10px; }
+  .profile-nome { font-family: 'Quicksand', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--branco); margin-bottom: 10px; }
   .profile-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; margin-bottom: 20px; }
   .profile-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
   .profile-features li { font-size: 0.8rem; color: var(--texto); display: flex; align-items: center; gap: 8px; }
@@ -481,7 +478,6 @@
   .profile-azul .profile-features li::before { color: var(--azul); }
   .profile-verde .profile-features li::before { color: var(--verde); }
   .profile-laranja .profile-features li::before { color: var(--laranja); }
-  /* FROTA */
   .frota-section { background: var(--carbon); }
   .frota-grid {
     display: grid;
@@ -505,8 +501,8 @@
     padding-bottom: 16px;
     border-bottom: 1px solid var(--borda);
   }
-  .frota-title-box { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--branco); }
-  .frota-saldo { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--verde); }
+  .frota-title-box { font-family: 'Quicksand', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--branco); }
+  .frota-saldo { font-family: 'Quicksand', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--verde); }
   .frota-saldo-label { font-size: 0.72rem; color: var(--muted); }
   .motorista-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--borda); }
   .motorista-row:last-child { border: none; }
@@ -540,9 +536,8 @@
     padding: 10px;
   }
   .benefit-icon-box svg { width: 100%; height: 100%; }
-  .benefit-text h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--branco); margin-bottom: 4px; }
+  .benefit-text h4 { font-family: 'Quicksand', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--branco); margin-bottom: 4px; }
   .benefit-text p { font-size: 0.83rem; color: var(--muted); line-height: 1.55; }
-  /* PAGAMENTOS */
   .pay-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -570,9 +565,8 @@
     padding: 10px;
   }
   .pay-icon svg { width: 100%; height: 100%; }
-  .pay-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--branco); margin-bottom: 8px; }
+  .pay-name { font-family: 'Quicksand', sans-serif; font-size: 1rem; font-weight: 700; color: var(--branco); margin-bottom: 8px; }
   .pay-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
-  /* CTA */
   .cta-section {
     text-align: center;
     padding: 100px 40px;
@@ -590,9 +584,9 @@
     pointer-events: none;
   }
   .cta-section h2 {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--branco);
     letter-spacing: -1.5px;
     margin-bottom: 20px;
@@ -611,7 +605,6 @@
   }
   .cta-trust span { display: flex; align-items: center; gap: 6px; }
   .cta-trust svg { color: var(--verde); width: 14px; height: 14px; }
-  /* FOOTER */
   footer {
     background: var(--carbon);
     border-top: 1px solid var(--borda);
@@ -629,7 +622,7 @@
     text-align: left;
   }
   .footer-brand p { font-size: 0.85rem; color: var(--muted); margin-top: 12px; line-height: 1.65; max-width: 260px; }
-  .footer-col h5 { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--texto); margin-bottom: 16px; }
+  .footer-col h5 { font-family: 'Quicksand', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--texto); margin-bottom: 16px; }
   .footer-col ul { list-style: none; }
   .footer-col ul li { margin-bottom: 10px; }
   .footer-col ul a { font-size: 0.85rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
@@ -667,7 +660,6 @@
 </head>
 <body>
 
-<!-- SVG DEFS reutilizáveis -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <symbol id="ico-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
@@ -731,7 +723,6 @@
   </symbol>
 </svg>
 
-<!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">abastec<span>IA</span></a>
   <ul class="nav-links">
@@ -743,7 +734,6 @@
   </ul>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-glow"></div>
   <div>
@@ -769,7 +759,6 @@
   </div>
 </section>
 
-<!-- STATS -->
 <div class="stats-bar reveal">
   <div class="stats-inner">
     <div class="stat-item">
@@ -791,7 +780,6 @@
   </div>
 </div>
 
-<!-- COMO FUNCIONA -->
 <section id="como-funciona">
   <div class="container">
     <div class="section-label">Fluxo operacional</div>
@@ -827,7 +815,6 @@
   </div>
 </section>
 
-<!-- FUNCIONALIDADES -->
 <section id="funcionalidades" class="features-section">
   <div class="container">
     <div class="features-header">
@@ -885,7 +872,6 @@
   </div>
 </section>
 
-<!-- DEMO VISUAL -->
 <section class="demo-section" id="demo">
   <div class="container">
     <div class="section-label">Painel ao vivo</div>
@@ -938,7 +924,7 @@
       </div>
 
       <div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--branco);margin-bottom:16px;line-height:1.2;">O frentista foca no que importa.<br><span style="color:var(--azul);">O sistema cuida do resto.</span></h3>
+        <h3 style="font-family:'Quicksand',sans-serif;font-size:1.5rem;font-weight:700;color:var(--branco);margin-bottom:16px;line-height:1.2;">O frentista foca no que importa.<br><span style="color:var(--azul);">O sistema cuida do resto.</span></h3>
         <p style="font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:32px;">Cada bomba tem sua própria maquininha PagBank com o app abastecIA instalado. Quando o cliente paga pelo celular, a maquininha mostra o pedido em menos de 3 segundos — sem digitar nada.</p>
 
         <ul class="demo-list">
@@ -964,7 +950,6 @@
   </div>
 </section>
 
-<!-- PERFIS -->
 <section id="perfis" style="background:var(--carbon);">
   <div class="container">
     <div class="section-label">Quem usa</div>
@@ -1009,7 +994,6 @@
   </div>
 </section>
 
-<!-- CONTROLE DE FROTA -->
 <section id="frota" class="frota-section">
   <div class="container">
     <div class="section-label" style="text-align:center;">Gestão de frotas</div>
@@ -1095,14 +1079,13 @@
         </div>
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;">
           <div style="font-size:0.78rem;color:var(--muted);">Gasto este mês</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco);">R$ 4.160,00</div>
+          <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:1.1rem;color:var(--branco);">R$ 4.160,00</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PAGAMENTOS -->
 <section id="pagamentos">
   <div class="container">
     <div class="section-label">Meios de pagamento</div>
@@ -1145,14 +1128,13 @@
         <svg style="width:28px;height:28px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#ico-light"/></svg>
       </div>
       <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--branco);margin-bottom:4px;">Modelo de cobrança transparente</div>
+        <div style="font-family:'Quicksand',sans-serif;font-weight:700;color:var(--branco);margin-bottom:4px;">Modelo de cobrança transparente</div>
         <div style="font-size:0.85rem;color:var(--muted);">O abastecIA cobra apenas <strong style="color:var(--branco);">1% sobre saques</strong> — do posto ou de contas de frota. Sem mensalidade, sem taxa por transação, sem surpresa.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
 <section class="cta-section">
   <div style="position:relative;z-index:1;">
     <div class="section-label">Pronto para começar?</div>
@@ -1177,7 +1159,6 @@
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
